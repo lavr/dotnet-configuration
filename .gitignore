@@ -11,3 +11,4 @@ artifacts/
 *.nuget.props
 .DS_Store
 Thumbs.db
+.aider*
