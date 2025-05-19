@@ -6,6 +6,7 @@ using Scriban.Runtime;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace Lavr.Configuration
 {
@@ -22,22 +23,32 @@ namespace Lavr.Configuration
             object current = values;
             foreach (var key in path.Split('.'))
             {
-                if (current is Dictionary<string, object> dict)
+                switch (current)
                 {
-                    if (!dict.TryGetValue(key, out current))
-                        throw new KeyNotFoundException($"Key '{key}' not found in path '{path}'.");
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        $"Expected a Dictionary<string, object> at '{key}', but found {current?.GetType().Name ?? "null"}");
+                    case IDictionary<string, object> dictS:
+                        if (!dictS.TryGetValue(key, out current))
+                            throw new KeyNotFoundException($"Key '{key}' not found in path '{path}'.");
+                        break;
+
+                    case IDictionary<object, object> dictO:
+                        // преобразуем к Dictionary<string, object>
+                        var temp = dictO.ToDictionary(
+                            kvp => kvp.Key.ToString(),
+                            kvp => kvp.Value
+                        );
+                        if (!temp.TryGetValue(key, out current))
+                            throw new KeyNotFoundException($"Key '{key}' not found in path '{path}'.");
+                        break;
+
+                    default:
+                        throw new InvalidOperationException(
+                            $"Expected a Dictionary at '{key}', but found {current?.GetType().Name ?? "null"}");
                 }
             }
 
             return current;
         }
-     }
-
+    }
     /// <summary>
     /// Extension methods for loading YAML templates into <see cref="IConfigurationBuilder"/>.
     /// </summary>
@@ -68,6 +79,11 @@ namespace Lavr.Configuration
                     throw new FileNotFoundException($"Template file not found: {templateFilePath}");
                 if (!optional && !File.Exists(valuesFilePath))
                     throw new FileNotFoundException($"Values file not found: {valuesFilePath}");
+
+                if (!File.Exists(templateFilePath)){
+                      if (optional) return;
+                      throw new FileNotFoundException($"Template file not found: {templateFilePath}");
+                }
 
                 var templateText = File.ReadAllText(templateFilePath);
                 var valuesYaml = File.ReadAllText(valuesFilePath);

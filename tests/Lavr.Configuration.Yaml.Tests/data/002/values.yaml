@@ -1,6 +1,6 @@
 global:
   public_url: https://app.corp.tld
-  databases:
+  database:
     postgres01:
       host: postgres.corp.tld
       port: "6432"
