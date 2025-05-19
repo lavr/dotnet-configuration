@@ -48,8 +48,37 @@ namespace Lavr.Configuration
                     .Build();
                 var values = deserializer.Deserialize<Dictionary<string, object>>(valuesYaml);
 
-                var scribanTemplate = Template.Parse(templateText);
                 var scriptObject = new ScriptObject();
+                Scriban.Runtime.ScriptObjectExtensions.Import(
+                    scriptObject,
+                    "to_yaml",
+                    new Func<object, string>(obj =>
+                    {
+                        var serializer = new SerializerBuilder()
+                            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                            .Build();
+                        return serializer.Serialize(obj);
+                    })
+                );
+
+                Scriban.Runtime.ScriptObjectExtensions.Import(
+                    scriptObject,
+                    "PostgresConnection",
+                    new Func<ScriptObject, string>(args =>
+                    {
+                        var database = args["database"]?.ToString() ?? throw new ArgumentException("Missing 'database'");
+                        var connectionName = args["server"]?.ToString() ?? "postgres01"; // TODO: не postgres01, а первый элемент в списке
+                        var db = values["global"]["databases"][connectionName];
+                        var host = db["host"].ToString();
+                        var port = db["port"].ToString(); // TODO: по-умолчанию 5432
+                        return $"Server={host};Port={port};Database={database}";
+                        // TODO: добавить больше опциональных параметров - таймауты, размер пула
+                    })
+                );
+
+
+                var scribanTemplate = Template.Parse(templateText);
+
                 scriptObject.Import(values);
 
                 var context = new TemplateContext();
