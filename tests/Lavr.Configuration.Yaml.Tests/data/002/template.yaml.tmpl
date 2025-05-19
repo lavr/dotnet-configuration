@@ -1,7 +1,8 @@
 {{ global.logging.common | to_yaml  }}
 ConnectionStrings:
-  Db1: {{ PostgresConnection { database: "dbname1", server: "postgres01" } }}
-  Db2: {{ PostgresConnection { database: "dbname2" } }}
+  Db1: {{ PostgresConnection { database: "dbname1" } }}
+  Db2: {{ PostgresConnection { database: "dbname2", path: "global.database.postgres01" } }}
+  Db3: {{ PostgresConnection { database: "dbname3", path: "global.database.postgres02" } }}
 SomeApiSettings:
   Host: {{ global.public_url }}/sorting
 Queue1:

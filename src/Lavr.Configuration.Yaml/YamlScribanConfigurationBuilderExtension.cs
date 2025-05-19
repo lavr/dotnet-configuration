@@ -9,6 +9,35 @@ using Microsoft.Extensions.Configuration;
 
 namespace Lavr.Configuration
 {
+
+    public static class DictionaryExtensions
+    {
+        public static object GetDictValueByPath(this Dictionary<string, object> values, string path)
+        {
+            if (values == null)
+                throw new ArgumentNullException(nameof(values));
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentException("Path cannot be null or empty", nameof(path));
+
+            object current = values;
+            foreach (var key in path.Split('.'))
+            {
+                if (current is Dictionary<string, object> dict)
+                {
+                    if (!dict.TryGetValue(key, out current))
+                        throw new KeyNotFoundException($"Key '{key}' not found in path '{path}'.");
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Expected a Dictionary<string, object> at '{key}', but found {current?.GetType().Name ?? "null"}");
+                }
+            }
+
+            return current;
+        }
+     }
+
     /// <summary>
     /// Extension methods for loading YAML templates into <see cref="IConfigurationBuilder"/>.
     /// </summary>
@@ -47,6 +76,7 @@ namespace Lavr.Configuration
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .Build();
                 var values = deserializer.Deserialize<Dictionary<string, object>>(valuesYaml);
+                // var dynamicValues = deserializer.Deserialize<dynamic>(valuesYaml);
 
                 var scriptObject = new ScriptObject();
                 Scriban.Runtime.ScriptObjectExtensions.Import(
@@ -67,8 +97,8 @@ namespace Lavr.Configuration
                     new Func<ScriptObject, string>(args =>
                     {
                         var database = args["database"]?.ToString() ?? throw new ArgumentException("Missing 'database'");
-                        var connectionName = args["server"]?.ToString() ?? "postgres01"; // TODO: не postgres01, а первый элемент в списке
-                        var db = values["global"]["databases"][connectionName];
+                        var path = args["path"]?.ToString() ?? "global.database.postgres01"; // TODO: не postgres01, а какое-то значение из конфига
+                        var db = (Dictionary<string, object>)values.GetDictValueByPath(path);
                         var host = db["host"].ToString();
                         var port = db["port"].ToString(); // TODO: по-умолчанию 5432
                         return $"Server={host};Port={port};Database={database}";

@@ -6,6 +6,12 @@ global:
       port: "6432"
       user: postgres-user
       password: postgres-password
+    postgres02:
+      host: postgres2.corp.tld
+      port: "5432"
+      user: user2
+      password: password2
+
   queues:
     rmq01:
       Host: rabbitmq.corp.tld
