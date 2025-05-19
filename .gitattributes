@@ -1,0 +1,50 @@
+* text=auto
+
+*.pdf	diff=astextplain
+*.PDF	diff=astextplain
+
+*.jpg  	binary
+*.png 	binary
+*.gif 	binary
+
+*.in text eol=lf
+*.sh text eol=lf
+
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+*.cs text diff=csharp
+*.vb text
+*.resx text
+*.c text
+*.cpp text
+*.cxx text
+*.h text
+*.hxx text
+*.py text
+*.rb text
+*.java text
+*.html text
+*.htm text
+*.css text
+*.scss text
+*.sass text
+*.less text
+*.js text
+*.lisp text
+*.clj text
+*.sql text
+*.php text
+*.lua text
+*.m text
+*.asm text
+*.erl text
+*.fs text
+*.fsx text
+*.hs text
+
+*.csproj text
+*.vbproj text
+*.fsproj text
+*.dbproj text
+*.sln text eol=crlf

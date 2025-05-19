@@ -1,0 +1,13 @@
+[Oo]bj/
+[Bb]in/
+.vs/
+.idea*
+BenchmarkDotNet.Artifacts*/
+coverage
+coverage.*
+junit.xml
+node_modules/
+artifacts/
+*.nuget.props
+.DS_Store
+Thumbs.db

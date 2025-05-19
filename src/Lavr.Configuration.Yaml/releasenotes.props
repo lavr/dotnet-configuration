@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.0.1'">
+      <![CDATA[
+Features:
+* Add support for loading YAML configuration from a Directory instead of a File
+
+]]>
+    </PackageReleaseNotes>
+  </PropertyGroup>
+</Project>
