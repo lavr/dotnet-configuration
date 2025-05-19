@@ -11,7 +11,7 @@ using System.Linq;
 namespace Lavr.Configuration
 {
 
-    public static class YamlScribanConfigurationBuilderExtension
+    public static class YamlScribanTemplateConfigurationBuilderExtension
     {
         /// <summary>
         /// Renders a Scriban YAML template using a values YAML file and loads the result into configuration.
