@@ -13,8 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Lavr.Configuration.Yaml\Lavr.Configuration.Yaml.csproj">
-      <Name>Lavr.Configuration.Yaml</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\Lavr.Configuration.Yaml\Lavr.Configuration.Yaml.csproj" />
   </ItemGroup>
 </Project>
