@@ -1,9 +1,3 @@
-Примеры реп:
-- https://github.com/domaindrivendev/Swashbuckle.AspNetCore/
-- https://github.com/dotnet/runtime/
-- https://github.com/andrewlock/NetEscapades.Configuration
-
-
 Пример темплейта:
 ```
 {{ global.logging.common | to_yaml  }}
@@ -31,8 +25,11 @@ global:
       Host: rabbitmq.corp.tld
       VirtualHost: ETH
       User: rmquser
-      Зassword: rmqpassword
+      Password: rmqpassword
   logging:
     common:
       ElasticApm: {}
 ```
+
+
+См также: AddYamlFile: https://github.com/andrewlock/NetEscapades.Configuration
