@@ -41,6 +41,5 @@ namespace Lavr.Configuration.Tests
             builder.AddYamlScribanTemplateFile(tmplPath, Path.Combine(tempDir, "no.yaml"), optional: true);
             builder.Build();
         }
-
     }
 }
