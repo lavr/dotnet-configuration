@@ -12,9 +12,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
   </ItemGroup>
 
-  <!--
-   <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Lavr.Configuration.Yaml\Lavr.Configuration.Yaml.csproj" />
   </ItemGroup>
-  -->
 </Project>
