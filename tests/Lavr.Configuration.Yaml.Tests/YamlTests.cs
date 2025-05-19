@@ -8,19 +8,17 @@ namespace Lavr.Configuration.Tests
 {
     public class YamlTemplateTests
     {
-        private const string Template = @"ConnectionStrings:\n  Db1: {{ global.databases.db1 }}";
-        private const string Values = @"global:\n  databases:\n    db1: Server=test;Database=db;User Id=sa;";
 
         [Fact]
-        public void AddYamlTemplateFile_LoadsValuesCorrectly()
+        public void AddYamlTemplateFile_LoadsValuesCorrectly_001()
         {
-            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(tempDir);
 
-            var tmplPath = Path.Combine(tempDir, "template.yaml.tmpl");
-            var valuesPath = Path.Combine(tempDir, "values.yaml");
-            File.WriteAllText(tmplPath, Template);
-            File.WriteAllText(valuesPath, Values);
+            var workingDir = Directory.GetCurrentDirectory();
+            var valuesPath = Path.Combine(workingDir, "data/001/values.yaml");
+            var tmplPath = Path.Combine(workingDir, "data/001/template.yaml.tmpl");
+
+            System.Console.WriteLine($"tmplPath: {tmplPath}");
+            System.Console.WriteLine($"valuesPath: {valuesPath}");
 
             var builder = new ConfigurationBuilder();
             builder.AddYamlTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
@@ -28,6 +26,22 @@ namespace Lavr.Configuration.Tests
 
             config["ConnectionStrings:Db1"].Should().Be("Server=test;Database=db;User Id=sa;");
         }
+
+        [Fact]
+        public void AddYamlTemplateFile_LoadsValuesCorrectly_002()
+        {
+
+            var workingDir = Directory.GetCurrentDirectory();
+            var valuesPath = Path.Combine(workingDir, "data/002/values.yaml");
+            var tmplPath = Path.Combine(workingDir, "data/002/template.yaml.tmpl");
+
+            var builder = new ConfigurationBuilder();
+            builder.AddYamlTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
+            var config = builder.Build();
+
+            config["ConnectionStrings:Db1"].Should().Be("Server=test;Database=db;User Id=sa;");
+        }
+
 
         [Fact]
         public void AddYamlTemplateFile_Optional_SkipsMissingFiles()

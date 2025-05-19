@@ -1,3 +1,5 @@
+Здесь будет расширение для IConfugurationBuilder, которое добавляет функцию AddYamlScribanTemplate()
+
 Пример темплейта:
 ```
 {{ global.logging.common | to_yaml  }}

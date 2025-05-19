@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -15,4 +15,16 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Lavr.Configuration.Yaml\Lavr.Configuration.Yaml.csproj" />
   </ItemGroup>
+
+   <!-- Include YAML files for unit tests and copy to output -->
+  <ItemGroup>
+    <None Include="**\*.yaml" CopyToOutputDirectory="Always" />
+    <None Include="**\*.tmpl" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <!-- Ensure YAML files are included in the test package -->
+  <PropertyGroup>
+    <IncludeTestContent>true</IncludeTestContent>
+  </PropertyGroup>
+
 </Project>
