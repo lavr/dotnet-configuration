@@ -17,24 +17,6 @@ namespace Lavr.Configuration.Tests
             var valuesPath = Path.Combine(workingDir, "data/001/values.yaml");
             var tmplPath = Path.Combine(workingDir, "data/001/template.yaml.tmpl");
 
-            System.Console.WriteLine($"tmplPath: {tmplPath}");
-            System.Console.WriteLine($"valuesPath: {valuesPath}");
-
-            var builder = new ConfigurationBuilder();
-            builder.AddYamlTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
-            var config = builder.Build();
-
-            config["ConnectionStrings:Db1"].Should().Be("Server=test;Database=db;User Id=sa;");
-        }
-
-        [Fact]
-        public void AddYamlTemplateFile_LoadsValuesCorrectly_002()
-        {
-
-            var workingDir = Directory.GetCurrentDirectory();
-            var valuesPath = Path.Combine(workingDir, "data/002/values.yaml");
-            var tmplPath = Path.Combine(workingDir, "data/002/template.yaml.tmpl");
-
             var builder = new ConfigurationBuilder();
             builder.AddYamlTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
             var config = builder.Build();

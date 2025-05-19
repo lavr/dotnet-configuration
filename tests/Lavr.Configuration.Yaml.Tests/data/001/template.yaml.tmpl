@@ -1,2 +1,9 @@
+{{ global.logging.common | to_yaml  }}
 ConnectionStrings:
-    Db1: {{ global.databases.db1 }}
+  Db1: {{ PostgresConnection { database: "dbname1" } }}
+  Db2: {{ PostgresConnection { database: "dbname2", path: "global.database.postgres01" } }}
+  Db3: {{ PostgresConnection { database: "dbname3", path: "global.database.postgres02" } }}
+SomeApiSettings:
+  Host: {{ global.public_url }}/sorting
+Queue1:
+{{ global.queues.rmq01 | to_yaml | indent(2) }}
