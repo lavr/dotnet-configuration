@@ -11,44 +11,51 @@ using System.Linq;
 namespace Lavr.Configuration
 {
 
-    public static class DictionaryExtensions
+    public static class Helper
     {
-        public static object GetDictValueByPath(this Dictionary<string, object> values, string path)
+        /// <summary>
+        /// Извлекает значение из иерархии словарей по точечному пути.
+        /// </summary>
+        /// <param name="root">Корневой объект, полученный из deserializer.Deserialize&lt;dynamic&gt;().</param>
+        /// <param name="path">Строка-путь, сегменты разделены точками: "x.y.z".</param>
+        /// <returns>
+        /// Либо найденный объект (может быть Dictionary, список, строка, число и т.п.),
+        /// либо null, если какой-то ключ отсутствовал или корневой объект не словарь.
+        /// </returns>
+        public static object GetByPath(object root, string path)
         {
-            if (values == null)
-                throw new ArgumentNullException(nameof(values));
-            if (string.IsNullOrEmpty(path))
-                throw new ArgumentException("Path cannot be null or empty", nameof(path));
+            if (root is not IDictionary<object, object> currentDict || string.IsNullOrWhiteSpace(path))
+                return null;
 
-            object current = values;
-            foreach (var key in path.Split('.'))
+            var segments = path.Split('.');
+            object current = currentDict;
+
+            foreach (var seg in segments)
             {
-                switch (current)
+                if (current is IDictionary<object, object> dict && dict.TryGetValue(seg, out var next))
                 {
-                    case IDictionary<string, object> dictS:
-                        if (!dictS.TryGetValue(key, out current))
-                            throw new KeyNotFoundException($"Key '{key}' not found in path '{path}'.");
-                        break;
-
-                    case IDictionary<object, object> dictO:
-                        // преобразуем к Dictionary<string, object>
-                        var temp = dictO.ToDictionary(
-                            kvp => kvp.Key.ToString(),
-                            kvp => kvp.Value
-                        );
-                        if (!temp.TryGetValue(key, out current))
-                            throw new KeyNotFoundException($"Key '{key}' not found in path '{path}'.");
-                        break;
-
-                    default:
-                        throw new InvalidOperationException(
-                            $"Expected a Dictionary at '{key}', but found {current?.GetType().Name ?? "null"}");
+                    current = next;
+                }
+                else
+                {
+                    // ключа нет или текущий объект уже не словарь
+                    return null;
                 }
             }
 
             return current;
         }
+
+        /// <summary>
+        /// Универсальный вариант с приводом к нужному типу.
+        /// </summary>
+        public static T GetByPath<T>(object root, string path)
+        {
+            var val = GetByPath(root, path);
+            return val is T casted ? casted : default!;
+        }
     }
+
     /// <summary>
     /// Extension methods for loading YAML templates into <see cref="IConfigurationBuilder"/>.
     /// </summary>
@@ -91,8 +98,8 @@ namespace Lavr.Configuration
                 var deserializer = new DeserializerBuilder()
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .Build();
-                var values = deserializer.Deserialize<Dictionary<string, object>>(valuesYaml);
-                // var dynamicValues = deserializer.Deserialize<dynamic>(valuesYaml);
+                // var values = deserializer.Deserialize<Dictionary<string, object>>(valuesYaml);
+                var values = deserializer.Deserialize<dynamic>(valuesYaml);
 
                 var scriptObject = new ScriptObject();
                 Scriban.Runtime.ScriptObjectExtensions.Import(
@@ -114,18 +121,26 @@ namespace Lavr.Configuration
                     {
                         var database = args["database"]?.ToString() ?? throw new ArgumentException("Missing 'database'");
                         var path = args["path"]?.ToString() ?? "global.database.postgres01"; // TODO: не postgres01, а какое-то значение из конфига
-                        var db = (Dictionary<string, object>)values.GetDictValueByPath(path);
+                        var db = Helper.GetByPath(values, path);
                         var host = db["host"].ToString();
-                        var port = db["port"].ToString(); // TODO: по-умолчанию 5432
+                        var port = db["port"]?.ToString() ?? "5432";
                         return $"Server={host};Port={port};Database={database}";
                         // TODO: добавить больше опциональных параметров - таймауты, размер пула
                     })
                 );
 
+                scriptObject.Import("indent", new Func<string, int, string>((text, spaces) =>
+                {
+                    var pad = new string(' ', spaces);
+                    var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                    return string.Join(Environment.NewLine, lines.Select(line => pad + line));
+                }));
+
 
                 var scribanTemplate = Template.Parse(templateText);
 
-                scriptObject.Import(values);
+                // scriptObject.Import(values);
+                Scriban.Runtime.ScriptObjectExtensions.Import(scriptObject, values);
 
                 var context = new TemplateContext();
                 context.PushGlobal(scriptObject);

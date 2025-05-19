@@ -39,7 +39,11 @@ namespace Lavr.Configuration.Tests
             builder.AddYamlTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
             var config = builder.Build();
 
-            config["ConnectionStrings:Db1"].Should().Be("Server=test;Database=db;User Id=sa;");
+            config["ConnectionStrings:Db1"].Should().Be("Server=postgres.corp.tld;Port=6432;Database=dbname1");
+            config["ConnectionStrings:Db2"].Should().Be("Server=postgres.corp.tld;Port=6432;Database=dbname2");
+            config["ConnectionStrings:Db3"].Should().Be("Server=postgres2.corp.tld;Port=5432;Database=dbname3");
+            config["SomeApiSettings:Host"].Should().Be("https://app.corp.tld/sorting");
+            config["Queue1:Host"].Should().Be("rabbitmq.corp.tld");
         }
 
 

@@ -6,4 +6,4 @@ ConnectionStrings:
 SomeApiSettings:
   Host: {{ global.public_url }}/sorting
 Queue1:
-{{ global.queues.queues | to_yaml | indent(2) }}
+{{ global.queues.rmq01 | to_yaml | indent(2) }}
