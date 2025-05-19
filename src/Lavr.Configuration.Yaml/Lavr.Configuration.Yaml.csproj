@@ -8,7 +8,7 @@
     <AssemblyName>Lavr.Configuration.Yaml</AssemblyName>
     <PackageId>Lavr.Configuration.Yaml</PackageId>
     <PackageTags>configuration;yaml;yml</PackageTags>
-    <PackageProjectUrl>https://github.com/lavr/Lavr.Configuration</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/lavr/dotnet-configuration/tree/master/src/Lavr.Configuration.Yaml</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/lavr/Lavr.Configuration</RepositoryUrl>
