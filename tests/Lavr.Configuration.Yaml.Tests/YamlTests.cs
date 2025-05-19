@@ -18,7 +18,7 @@ namespace Lavr.Configuration.Tests
             var tmplPath = Path.Combine(workingDir, "data/001/template.yaml.tmpl");
 
             var builder = new ConfigurationBuilder();
-            builder.AddYamlTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
+            builder.AddYamlScribanTemplateFile(tmplPath, valuesPath, optional: false, reloadOnChange: false);
             var config = builder.Build();
 
             config["ConnectionStrings:Db1"].Should().Be("Server=postgres.corp.tld;Port=6432;Database=dbname1");
@@ -38,8 +38,9 @@ namespace Lavr.Configuration.Tests
             var tmplPath = Path.Combine(tempDir, "missing.tmpl");
             var builder = new ConfigurationBuilder();
             // Should not throw
-            builder.AddYamlTemplateFile(tmplPath, Path.Combine(tempDir, "no.yaml"), optional: true);
+            builder.AddYamlScribanTemplateFile(tmplPath, Path.Combine(tempDir, "no.yaml"), optional: true);
             builder.Build();
         }
+
     }
 }

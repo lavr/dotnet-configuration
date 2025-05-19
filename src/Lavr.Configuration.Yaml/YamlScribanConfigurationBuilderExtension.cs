@@ -11,54 +11,6 @@ using System.Linq;
 namespace Lavr.Configuration
 {
 
-    public static class Helper
-    {
-        /// <summary>
-        /// Извлекает значение из иерархии словарей по точечному пути.
-        /// </summary>
-        /// <param name="root">Корневой объект, полученный из deserializer.Deserialize&lt;dynamic&gt;().</param>
-        /// <param name="path">Строка-путь, сегменты разделены точками: "x.y.z".</param>
-        /// <returns>
-        /// Либо найденный объект (может быть Dictionary, список, строка, число и т.п.),
-        /// либо null, если какой-то ключ отсутствовал или корневой объект не словарь.
-        /// </returns>
-        public static object GetByPath(object root, string path)
-        {
-            if (root is not IDictionary<object, object> currentDict || string.IsNullOrWhiteSpace(path))
-                return null;
-
-            var segments = path.Split('.');
-            object current = currentDict;
-
-            foreach (var seg in segments)
-            {
-                if (current is IDictionary<object, object> dict && dict.TryGetValue(seg, out var next))
-                {
-                    current = next;
-                }
-                else
-                {
-                    // ключа нет или текущий объект уже не словарь
-                    return null;
-                }
-            }
-
-            return current;
-        }
-
-        /// <summary>
-        /// Универсальный вариант с приводом к нужному типу.
-        /// </summary>
-        public static T GetByPath<T>(object root, string path)
-        {
-            var val = GetByPath(root, path);
-            return val is T casted ? casted : default!;
-        }
-    }
-
-    /// <summary>
-    /// Extension methods for loading YAML templates into <see cref="IConfigurationBuilder"/>.
-    /// </summary>
     public static class YamlScribanConfigurationBuilderExtension
     {
         /// <summary>
@@ -70,12 +22,13 @@ namespace Lavr.Configuration
         /// <param name="optional">Whether loading is optional if files are missing.</param>
         /// <param name="reloadOnChange">Whether to reload config when files change.</param>
         /// <returns>The configuration builder.</returns>
-        public static IConfigurationBuilder AddYamlTemplateFile(
+        public static IConfigurationBuilder AddYamlScribanTemplateFile(
             this IConfigurationBuilder builder,
             string templateFilePath,
             string valuesFilePath = "values.yaml",
             bool optional = false,
-            bool reloadOnChange = false)
+            bool reloadOnChange = false,
+            bool save = true)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(templateFilePath)) throw new ArgumentException("Template file path must be provided", nameof(templateFilePath));
@@ -121,7 +74,7 @@ namespace Lavr.Configuration
                     {
                         var database = args["database"]?.ToString() ?? throw new ArgumentException("Missing 'database'");
                         var path = args["path"]?.ToString() ?? "global.database.postgres01"; // TODO: не postgres01, а какое-то значение из конфига
-                        var db = Helper.GetByPath(values, path);
+                        var db = Helpers.GetByPath(values, path);
                         var host = db["host"].ToString();
                         var port = db["port"]?.ToString() ?? "5432";
                         return $"Server={host};Port={port};Database={database}";
@@ -146,6 +99,20 @@ namespace Lavr.Configuration
                 context.PushGlobal(scriptObject);
 
                 var rendered = scribanTemplate.Render(context);
+
+                // Save rendered file if requested
+                if (save)
+                {
+                    var dir = Path.GetDirectoryName(templateFilePath) ?? string.Empty;
+                    var fileName = Path.GetFileName(templateFilePath);
+                    // Remove only .tmpl extension
+                    var trimmed = fileName.EndsWith(".tmpl", StringComparison.OrdinalIgnoreCase)
+                        ? fileName.Substring(0, fileName.Length - ".tmpl".Length)
+                        : fileName;
+                    var saveName = "." + trimmed;
+                    var savePath = Path.Combine(dir, saveName);
+                    File.WriteAllText(savePath, rendered);
+                }
 
                 // Parse rendered YAML into key/value pairs
                 var yamlDeserializer = new DeserializerBuilder()
