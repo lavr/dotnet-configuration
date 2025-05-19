@@ -25,7 +25,7 @@ namespace Lavr.Configuration
         public static IConfigurationBuilder AddYamlScribanTemplateFile(
             this IConfigurationBuilder builder,
             string templateFilePath,
-            string valuesFilePath = "values.yaml",
+            string valuesFilePath = "appvalues.yaml",
             bool optional = false,
             bool reloadOnChange = false,
             bool save = true)
