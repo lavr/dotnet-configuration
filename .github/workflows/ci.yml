@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-test-push:
     runs-on: ubuntu-latest
 
     steps:
