@@ -1,0 +1,2 @@
+global:
+  MySetting: yaml.tmpl.value

@@ -35,14 +35,15 @@ namespace Lavr.Configuration
 
             void Load()
             {
-                if (!optional && !File.Exists(templateFilePath))
-                    throw new FileNotFoundException($"Template file not found: {templateFilePath}");
-                if (!optional && !File.Exists(valuesFilePath))
-                    throw new FileNotFoundException($"Values file not found: {valuesFilePath}");
 
                 if (!File.Exists(templateFilePath)){
                       if (optional) return;
                       throw new FileNotFoundException($"Template file not found: {templateFilePath}");
+                }
+
+                if (!File.Exists(valuesFilePath)){
+                      if (optional) return;
+                      throw new FileNotFoundException($"Values file not found: {valuesFilePath}");
                 }
 
                 var templateText = File.ReadAllText(templateFilePath);
